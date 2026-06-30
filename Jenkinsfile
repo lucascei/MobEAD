@@ -72,22 +72,27 @@ pipeline {
             steps {
                 echo '>>> Etapa 5: Análise de qualidade com SonarQube'
                 withSonarQubeEnv('SonarQube') {
-                    sh """
-                        if [ -z "\${SONAR_TOKEN}" ]; then
+                    sh '''
+                        # Jenkins SonarQube plugin injeta SONAR_AUTH_TOKEN (não SONAR_TOKEN)
+                        if [ -n "${SONAR_AUTH_TOKEN}" ]; then
+                            export SONAR_TOKEN="${SONAR_AUTH_TOKEN}"
+                        fi
+
+                        if [ -z "${SONAR_TOKEN}" ]; then
                             echo "ERRO: Token do SonarQube não configurado."
                             echo "Configure em: Manage Jenkins > Credentials > sonar-token"
+                            echo "SONAR_HOST_URL=${SONAR_HOST_URL:-vazio}"
                             exit 1
                         fi
+
                         sonar-scanner \
-                            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                            -Dsonar.projectKey=''' + SONAR_PROJECT_KEY + ''' \
                             -Dsonar.projectName='MobEAD - Lucas Alves' \
                             -Dsonar.sources=Scripts,lib,index.html \
                             -Dsonar.tests=tests \
                             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                            -Dsonar.sourceEncoding=UTF-8 \
-                            -Dsonar.host.url=\${SONAR_HOST_URL} \
-                            -Dsonar.token=\${SONAR_TOKEN}
-                    """
+                            -Dsonar.sourceEncoding=UTF-8
+                    '''
                 }
             }
         }
