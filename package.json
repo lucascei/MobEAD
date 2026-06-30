@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build.js",
-    "test": "mocha tests/**/*.test.js --reporter mocha-junit-reporter --reporter-options mochaFile=test-results.xml --reporter spec",
+    "test": "mocha tests/**/*.test.js --reporter spec && mocha tests/**/*.test.js --reporter mocha-junit-reporter --reporter-options mochaFile=test-results.xml",
     "test:coverage": "nyc --reporter=lcov --reporter=text npm run test"
   },
   "devDependencies": {

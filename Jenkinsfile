@@ -72,21 +72,22 @@ pipeline {
             steps {
                 echo '>>> Etapa 5: Análise de qualidade com SonarQube'
                 withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        docker run --rm \
-                            -v "${WORKSPACE}:/usr/src" \
-                            -w /usr/src \
-                            --network mobead-network \
-                            sonarsource/sonar-scanner-cli:latest \
+                    sh """
+                        if [ -z "\${SONAR_TOKEN}" ]; then
+                            echo "ERRO: Token do SonarQube não configurado."
+                            echo "Configure em: Manage Jenkins > Credentials > sonar-token"
+                            exit 1
+                        fi
+                        sonar-scanner \
                             -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                            -Dsonar.projectName="MobEAD - Lucas Alves" \
+                            -Dsonar.projectName='MobEAD - Lucas Alves' \
                             -Dsonar.sources=Scripts,lib,index.html \
                             -Dsonar.tests=tests \
                             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
                             -Dsonar.sourceEncoding=UTF-8 \
-                            -Dsonar.host.url=${SONAR_HOST_URL} \
-                            -Dsonar.token=${SONAR_TOKEN}
-                    '''
+                            -Dsonar.host.url=\${SONAR_HOST_URL} \
+                            -Dsonar.token=\${SONAR_TOKEN}
+                    """
                 }
             }
         }
@@ -103,13 +104,13 @@ pipeline {
         stage('Gerar artefato') {
             steps {
                 echo '>>> Etapa 6: Geração de artefato e imagem Docker'
-                sh '''
-                    tar -czf ${ARTIFACT_NAME} \
-                        index.html kickstrap.css mine.css \
+                sh """
+                    tar -czf ${ARTIFACT_NAME} \\
+                        index.html kickstrap.css mine.css \\
                         Scripts Kickstrap Web.config lib
                     docker build -t ${DOCKER_IMAGE} .
                     docker tag ${DOCKER_IMAGE} mobead:latest
-                '''
+                """
                 archiveArtifacts artifacts: "${ARTIFACT_NAME}", fingerprint: true
             }
         }
