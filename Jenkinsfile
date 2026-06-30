@@ -71,28 +71,24 @@ pipeline {
         stage('SonarQube') {
             steps {
                 echo '>>> Etapa 5: Análise de qualidade com SonarQube'
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        # Jenkins SonarQube plugin injeta SONAR_AUTH_TOKEN (não SONAR_TOKEN)
-                        if [ -n "${SONAR_AUTH_TOKEN}" ]; then
-                            export SONAR_TOKEN="${SONAR_AUTH_TOKEN}"
-                        fi
-
-                        if [ -z "${SONAR_TOKEN}" ]; then
-                            echo "ERRO: Token do SonarQube não configurado."
-                            echo "Configure em: Manage Jenkins > Credentials > sonar-token"
-                            echo "SONAR_HOST_URL=${SONAR_HOST_URL:-vazio}"
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh """
+                        if [ -z "\$SONAR_TOKEN" ] || [ "\$SONAR_TOKEN" = "SUBSTITUIR_PELO_TOKEN_DO_SONARQUBE" ]; then
+                            echo "ERRO: Token do SonarQube vazio ou inválido."
+                            echo "Execute: ./scripts/configure-sonar-token.sh"
                             exit 1
                         fi
 
                         sonar-scanner \
-                            -Dsonar.projectKey=''' + SONAR_PROJECT_KEY + ''' \
+                            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                             -Dsonar.projectName='MobEAD - Lucas Alves' \
                             -Dsonar.sources=Scripts,lib,index.html \
                             -Dsonar.tests=tests \
                             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                            -Dsonar.sourceEncoding=UTF-8
-                    '''
+                            -Dsonar.sourceEncoding=UTF-8 \
+                            -Dsonar.host.url=http://sonarqube:9000 \
+                            -Dsonar.token=\$SONAR_TOKEN
+                    """
                 }
             }
         }

@@ -340,6 +340,7 @@ ASALocalRun/
 healthchecksdb
 
 # CI/CD - Node.js e artefatos locais
+.env
 coverage/
 .nyc_output/
 dist/

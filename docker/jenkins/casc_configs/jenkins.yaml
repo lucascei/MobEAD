@@ -20,7 +20,7 @@ credentials:
               scope: GLOBAL
               id: sonar-token
               description: "Token do SonarQube (substitua após primeiro acesso)"
-              secret: "SUBSTITUIR_PELO_TOKEN_DO_SONARQUBE"
+              secret: ${SONAR_TOKEN}
 
 unclassified:
   sonarGlobalConfiguration:

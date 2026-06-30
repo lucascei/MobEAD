@@ -66,6 +66,10 @@ services:
       DOCKER_HOST: unix:///var/run/docker.sock
       JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
       CASC_JENKINS_CONFIG: /var/jenkins_home/casc_configs/jenkins.yaml
+      SONAR_TOKEN: ${SONAR_TOKEN:-}
+    env_file:
+      - path: .env
+        required: false
     networks:
       - mobead-network
     restart: unless-stopped
