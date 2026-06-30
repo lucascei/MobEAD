@@ -52,7 +52,6 @@ services:
       args:
         DOCKER_GID: 1001
     container_name: jenkins
-    user: root
     depends_on:
       sonarqube:
         condition: service_healthy

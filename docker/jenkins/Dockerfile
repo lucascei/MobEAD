@@ -15,8 +15,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# Permite o usuário jenkins usar o Docker do host
-RUN groupadd -f -g ${DOCKER_GID} docker \
+# Permite o usuário jenkins usar o Docker do host (GID deve coincidir com o host)
+RUN if getent group docker >/dev/null; then \
+      groupmod -o -g ${DOCKER_GID} docker; \
+    else \
+      groupadd -g ${DOCKER_GID} docker; \
+    fi \
     && usermod -aG docker jenkins
 
 # SonarScanner instalado na imagem (evita docker run na etapa SonarQube)
@@ -30,5 +34,8 @@ COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 
 COPY casc_configs/ /usr/share/jenkins/ref/casc_configs/
+
+# Evita erro "dubious ownership" no cache Git do Jenkins
+RUN git config --global --add safe.directory '*'
 
 USER jenkins
