@@ -98,8 +98,11 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 echo '>>> Aguardando resultado do Quality Gate no SonarQube'
-                timeout(time: 5, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: false
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        chmod +x scripts/check-quality-gate.sh
+                        ./scripts/check-quality-gate.sh ''' + SONAR_PROJECT_KEY + ''' http://sonarqube:9000
+                    '''
                 }
             }
         }
