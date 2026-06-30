@@ -1,0 +1,2 @@
+# Host vars individuais (opcional)
+# Exemplo: ansible/host_vars/vm-mobead-iac-lucas-alves.yml

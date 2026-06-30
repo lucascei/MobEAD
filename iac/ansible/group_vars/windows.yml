@@ -1,0 +1,26 @@
+---
+# Variáveis do grupo Windows - MobEAD IaC
+
+ansible_connection: winrm
+ansible_winrm_transport: ntlm
+ansible_winrm_server_cert_validation: ignore
+ansible_port: 5986
+ansible_winrm_scheme: https
+
+# Site IIS
+iis_site_name: MobEAD
+iis_site_port: 80
+iis_site_path: C:\inetpub\wwwroot\mobead
+iis_default_doc: index.html
+
+# Metadados da página
+mobead_title: MobEAD
+student_name: Lucas Alves
+course_name: Engenharia DevOps
+pipeline_info: Pipeline CI/CD
+tech_stack:
+  - Terraform
+  - Ansible
+  - Docker
+  - Jenkins
+  - SonarQube

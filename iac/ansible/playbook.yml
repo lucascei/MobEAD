@@ -1,0 +1,41 @@
+---
+# Playbook principal - MobEAD IaC
+# Aluno: Lucas Alves | Engenharia DevOps - Unyleya
+#
+# Executa:
+#   ansible-playbook -i inventory.ini playbook.yml
+
+- name: Configurar servidor Windows MobEAD com IIS
+  hosts: windows
+  gather_facts: true
+
+  pre_tasks:
+    - name: Aguardar WinRM ficar disponível
+      ansible.windows.win_ping:
+      register: winrm_ping
+      until: winrm_ping is succeeded
+      retries: 30
+      delay: 20
+
+    - name: Validar conexão WinRM
+      ansible.windows.win_ping:
+      tags: [always]
+
+  roles:
+    - role: windows
+      tags: [iis, mobead]
+
+  post_tasks:
+    - name: Validar resposta HTTP do IIS
+      ansible.windows.win_uri:
+        url: "http://localhost/"
+        return_content: true
+        status_code: 200
+      register: iis_check
+      tags: [validate]
+
+    - name: Exibir resultado da validação
+      ansible.builtin.debug:
+        msg: "IIS respondendo com sucesso - página MobEAD publicada"
+      when: iis_check is succeeded
+      tags: [validate]

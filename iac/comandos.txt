@@ -1,0 +1,118 @@
+# Comandos utilizados — MobEAD IaC (Unidade 4)
+# Aluno: Lucas Alves | Engenharia DevOps - Unyleya
+
+# =============================================================================
+# GIT / GITHUB
+# =============================================================================
+git checkout develop
+git add iac/
+git status
+git commit -m "Adiciona Infraestrutura como Código com Terraform e Ansible"
+git push origin develop
+
+# =============================================================================
+# AZURE CLI — AUTENTICAÇÃO
+# =============================================================================
+az login
+az account list --output table
+az account set --subscription "SUA_SUBSCRIPTION_ID"
+az group list --output table
+
+# Variáveis de ambiente (Service Principal - opcional)
+export ARM_SUBSCRIPTION_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+export ARM_TENANT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+export ARM_CLIENT_ID="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+export ARM_CLIENT_SECRET="sua-chave-secreta"
+
+# =============================================================================
+# TERRAFORM
+# =============================================================================
+cd iac/terraform
+
+# Configurar variáveis
+cp terraform.tfvars.example terraform.tfvars
+
+# Inicializar providers e módulos
+terraform init
+
+# Validar sintaxe
+terraform validate
+
+# Formatar código
+terraform fmt -recursive
+
+# Visualizar plano de execução
+terraform plan -out=tfplan
+
+# Aplicar infraestrutura
+terraform apply tfplan
+
+# Aplicar direto (sem salvar plano)
+terraform apply -auto-approve
+
+# Ver outputs (IP, nome VM, etc.)
+terraform output
+terraform output public_ip_address
+terraform output vm_name
+terraform output resource_group_name
+
+# Destruir toda a infraestrutura
+terraform destroy
+
+# =============================================================================
+# ANSIBLE — PRÉ-REQUISITOS
+# =============================================================================
+pip install ansible pywinrm
+cd iac/ansible
+ansible-galaxy collection install -r requirements.yml
+
+# =============================================================================
+# ANSIBLE — EXECUÇÃO
+# =============================================================================
+# Gerar inventory a partir do Terraform
+./iac/scripts/generate-inventory.sh
+
+# Testar conexão WinRM
+cd iac/ansible
+ansible windows -i inventory.ini -m ansible.windows.win_ping
+
+# Executar playbook completo
+ansible-playbook -i inventory.ini playbook.yml
+
+# Executar apenas validação
+ansible-playbook -i inventory.ini playbook.yml --tags validate
+
+# =============================================================================
+# VALIDAÇÃO
+# =============================================================================
+# Validar IIS via script
+./iac/scripts/validate-iis.sh
+
+# Validar manualmente via curl
+curl -I http://SEU_IP_PUBLICO/
+
+# Conectar via RDP
+mstsc /v:SEU_IP_PUBLICO
+
+# =============================================================================
+# VERIFICAÇÃO NA AZURE
+# =============================================================================
+az vm list --resource-group rg-mobead-iac-lucas-alves --output table
+az network public-ip show --resource-group rg-mobead-iac-lucas-alves --name mobead-pip --query ipAddress
+az group show --name rg-mobead-iac-lucas-alves
+
+# =============================================================================
+# JENKINS (PIPELINE IaC - OPCIONAL)
+# =============================================================================
+# Criar job: "MobEAD - Lucas Alves - IaC"
+# Script Path: iac/Jenkinsfile
+# Branch: develop
+
+# =============================================================================
+# COMANDOS AUXILIARES
+# =============================================================================
+# Ver histórico Git
+git log --oneline --graph iac/
+
+# Listar arquivos IaC
+find iac/ -type f | sort

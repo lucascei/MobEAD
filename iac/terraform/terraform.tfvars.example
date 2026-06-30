@@ -1,0 +1,35 @@
+# =============================================================================
+# Exemplo de variáveis Terraform - MobEAD IaC
+# Copie para terraform.tfvars e preencha os valores:
+#   cp terraform.tfvars.example terraform.tfvars
+# =============================================================================
+
+project_name        = "mobead"
+student_name        = "Lucas Alves"
+environment         = "iac"
+location            = "brazilsouth"
+resource_group_name = "rg-mobead-iac-lucas-alves"
+
+vnet_address_space    = ["10.10.0.0/16"]
+subnet_address_prefix = "10.10.1.0/24"
+
+vm_name = "vm-mobead-iac-lucas-alves"
+vm_size = "Standard_B2s"
+
+admin_username = "azureadmin"
+# OBRIGATÓRIO: senha forte (mín. 12 chars, maiúscula, minúscula, número e símbolo)
+admin_password = "AltereEstaSenha!2026"
+
+windows_sku     = "2022-Datacenter"
+os_disk_size_gb = 128
+
+# Restrinja ao seu IP para maior segurança (ex: "203.0.113.10/32")
+allowed_source_ips = ["*"]
+
+tags = {
+  Projeto    = "MobEAD"
+  Aluno      = "Lucas Alves"
+  Disciplina = "Engenharia DevOps"
+  Unidade    = "IaC - Unidade 4"
+  Gerenciado = "Terraform"
+}

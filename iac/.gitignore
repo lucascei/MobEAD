@@ -1,0 +1,19 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+terraform.tfvars
+crash.log
+override.tf
+override.tf.json
+
+# Ansible
+ansible/inventory.ini
+*.retry
+.vault_pass
+
+# Credenciais
+.env
+*.pem

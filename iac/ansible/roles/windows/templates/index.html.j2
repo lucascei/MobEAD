@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ mobead_title }} - IaC | {{ student_name }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #eee;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 48px;
+            max-width: 700px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-size: 2.5rem;
+            color: #e94560;
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-size: 1.2rem;
+            color: #a8dadc;
+            font-weight: 400;
+            margin-bottom: 32px;
+        }
+        .info-grid {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            border-left: 3px solid #e94560;
+        }
+        .label { color: #a8dadc; min-width: 160px; font-size: 0.9rem; }
+        .value { font-weight: 600; }
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .tech-badge {
+            background: #e94560;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .status { color: #4ecca3; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ mobead_title }}</h1>
+        <h2>Infraestrutura como Código — Engenharia DevOps</h2>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="label">Aluno</span>
+                <span class="value">{{ student_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Disciplina</span>
+                <span class="value">{{ course_name }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Pipeline</span>
+                <span class="value">{{ pipeline_info }}</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Status IIS</span>
+                <span class="value status">Online</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Data da implantação</span>
+                <span class="value">{{ ansible_date_time.date }} {{ ansible_date_time.time }} (UTC)</span>
+            </div>
+            <div class="info-item" style="flex-direction: column; align-items: flex-start;">
+                <span class="label">Stack tecnológica</span>
+                <div class="tech-list">
+                    {% for tech in tech_stack %}
+                    <span class="tech-badge">{{ tech }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Provisionado com Terraform + Configurado com Ansible<br>
+            MobEAD — Unyleya Engenharia DevOps
+        </div>
+    </div>
+</body>
+</html>

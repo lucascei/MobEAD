@@ -1,0 +1,74 @@
+---
+# Role Windows - Instalação e configuração do IIS + página MobEAD
+
+- name: Instalar recurso Web Server (IIS)
+  ansible.windows.win_feature:
+    name: Web-Server
+    state: present
+    include_management_tools: true
+  register: iis_feature
+
+- name: Criar diretório do site MobEAD
+  ansible.windows.win_file:
+    path: "{{ iis_site_path }}"
+    state: directory
+
+- name: Publicar página HTML MobEAD
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ iis_site_path }}\\{{ iis_default_doc }}"
+  notify: Reiniciar IIS
+
+- name: Remover site Default Web Site (se existir)
+  ansible.windows.win_shell: |
+    Import-Module WebAdministration -ErrorAction SilentlyContinue
+    if (Test-Path "IIS:\Sites\Default Web Site") {
+      Remove-Website -Name "Default Web Site"
+    }
+  ignore_errors: true
+
+- name: Criar e iniciar site IIS MobEAD
+  ansible.windows.win_shell: |
+    Import-Module WebAdministration
+    $siteName = "{{ iis_site_name }}"
+    $path = "{{ iis_site_path }}"
+    $port = {{ iis_site_port }}
+    if (Test-Path "IIS:\Sites\$siteName") {
+      Set-ItemProperty "IIS:\Sites\$siteName" -Name physicalPath -Value $path
+    } else {
+      New-Website -Name $siteName -Port $port -PhysicalPath $path -Force
+    }
+    Start-Website -Name $siteName
+  notify: Reiniciar IIS
+
+- name: Garantir serviço W3SVC (IIS) iniciado
+  ansible.windows.win_service:
+    name: W3SVC
+    start_mode: auto
+    state: started
+
+- name: Garantir serviço WAS iniciado
+  ansible.windows.win_service:
+    name: WAS
+    start_mode: auto
+    state: started
+
+- name: Abrir porta HTTP 80 no Firewall Windows
+  ansible.windows.win_firewall_rule:
+    name: MobEAD-HTTP-80
+    localport: 80
+    action: allow
+    direction: in
+    protocol: tcp
+    state: present
+    enabled: true
+
+- name: Abrir porta HTTPS 443 no Firewall Windows
+  ansible.windows.win_firewall_rule:
+    name: MobEAD-HTTPS-443
+    localport: 443
+    action: allow
+    direction: in
+    protocol: tcp
+    state: present
+    enabled: true

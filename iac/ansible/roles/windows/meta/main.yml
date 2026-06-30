@@ -1,0 +1,13 @@
+---
+galaxy_info:
+  role_name: windows
+  description: Instala IIS e publica pagina MobEAD no Windows Server
+  author: Lucas Alves
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Windows
+      versions:
+        - 2019
+        - 2022
+dependencies: []

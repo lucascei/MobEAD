@@ -1,0 +1,17 @@
+# =============================================================================
+# Inventory Ansible - MobEAD IaC (Windows Server / WinRM)
+# Gere automaticamente: ../scripts/generate-inventory.sh
+# Ou copie de: inventory.ini.example
+# =============================================================================
+
+[windows]
+vm-mobead-iac-lucas-alves ansible_host=SEU_IP_PUBLICO_AQUI
+
+[windows:vars]
+ansible_user=azureadmin
+ansible_password=SUA_SENHA_AQUI
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore
+ansible_port=5986
+ansible_winrm_scheme=https

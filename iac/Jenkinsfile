@@ -1,0 +1,122 @@
+// Pipeline IaC - MobEAD - Lucas Alves
+// Nome sugerido no Jenkins: "MobEAD - Lucas Alves - IaC"
+
+pipeline {
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        timeout(time: 90, unit: 'MINUTES')
+        timestamps()
+    }
+
+    environment {
+        TF_DIR     = "${WORKSPACE}/iac/terraform"
+        ANSIBLE_DIR = "${WORKSPACE}/iac/ansible"
+        ARM_SUBSCRIPTION_ID = credentials('azure-subscription-id')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo '>>> Checkout do repositório GitHub'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                dir("${TF_DIR}") {
+                    sh 'terraform init -input=false'
+                }
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                dir("${TF_DIR}") {
+                    sh 'terraform validate'
+                    sh 'terraform fmt -check -recursive || true'
+                }
+            }
+        }
+
+        stage('Terraform Plan') {
+            steps {
+                dir("${TF_DIR}") {
+                    sh 'terraform plan -input=false -out=tfplan'
+                }
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                dir("${TF_DIR}") {
+                    sh 'terraform apply -input=false -auto-approve tfplan'
+                    sh 'terraform output'
+                }
+            }
+        }
+
+        stage('Gerar Inventory Ansible') {
+            steps {
+                sh '''
+                    cd iac/terraform
+                    PUBLIC_IP=$(terraform output -raw public_ip_address)
+                    VM_NAME=$(terraform output -raw vm_name)
+                    ADMIN_USER=$(terraform output -raw admin_username)
+                    cat > ../ansible/inventory.ini <<EOF
+[windows]
+${VM_NAME} ansible_host=${PUBLIC_IP}
+
+[windows:vars]
+ansible_user=${ADMIN_USER}
+ansible_password=${AZURE_VM_PASSWORD}
+ansible_connection=winrm
+ansible_winrm_transport=ntlm
+ansible_winrm_server_cert_validation=ignore
+ansible_port=5986
+ansible_winrm_scheme=https
+EOF
+                '''
+            }
+        }
+
+        stage('Executar Playbook Ansible') {
+            steps {
+                withCredentials([string(credentialsId: 'azure-vm-password', variable: 'AZURE_VM_PASSWORD')]) {
+                    dir("${ANSIBLE_DIR}") {
+                        sh '''
+                            ansible-galaxy collection install -r requirements.yml
+                            sleep 60
+                            ansible-playbook -i inventory.ini playbook.yml
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Validar IIS') {
+            steps {
+                sh 'chmod +x iac/scripts/validate-iis.sh && ./iac/scripts/validate-iis.sh'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '''
+========================================
+Pipeline IaC MobEAD - Lucas Alves
+STATUS: SUCESSO
+Terraform Apply  -> OK
+Ansible Playbook -> OK
+IIS Validado     -> OK
+========================================
+'''
+        }
+        failure {
+            echo 'Pipeline IaC falhou. Verifique logs e credenciais Azure.'
+        }
+    }
+}
