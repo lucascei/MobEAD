@@ -1,0 +1,39 @@
+jenkins:
+  systemMessage: "Jenkins - MobEAD CI/CD - Lucas Alves"
+  numExecutors: 2
+  mode: NORMAL
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin123"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              scope: GLOBAL
+              id: sonar-token
+              description: "Token do SonarQube (substitua após primeiro acesso)"
+              secret: "SUBSTITUIR_PELO_TOKEN_DO_SONARQUBE"
+
+unclassified:
+  sonarGlobalConfiguration:
+    installations:
+      - name: "SonarQube"
+        serverUrl: "http://sonarqube:9000"
+        credentialsId: "sonar-token"
+        triggers:
+          skipScmCause: false
+          skipUpstreamCause: false
+
+security:
+  scriptApproval:
+    approvedSignatures:
+      - "method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object"
+      - "staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods toInteger java.lang.Number"

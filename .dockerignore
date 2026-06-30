@@ -1,0 +1,14 @@
+.git
+__MACOSX
+node_modules
+coverage
+.nyc_output
+*.tar.gz
+test-results.xml
+.docker
+evidencias
+*.md
+!README.md
+azure-pipelines*.yml
+MobEAD.sln
+.gitattributes

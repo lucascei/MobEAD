@@ -1,0 +1,12 @@
+configuration-as-code:latest
+workflow-aggregator:latest
+git:latest
+github:latest
+pipeline-stage-view:latest
+docker-workflow:latest
+sonar:latest
+htmlpublisher:latest
+junit:latest
+credentials-binding:latest
+timestamper:latest
+ws-cleanup:latest

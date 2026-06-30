@@ -1,0 +1,104 @@
+# Comandos Git utilizados na atividade - Lucas Alves
+# Repositório original: https://github.com/osanam-giordane/MobEAD
+# Fork: https://github.com/lucascei/MobEAD.git
+
+# =============================================================================
+# 1. FORK DO REPOSITÓRIO (via interface web do GitHub) — CONCLUÍDO
+# =============================================================================
+# Fork criado em: https://github.com/lucascei/MobEAD
+# Origem: osanam-giordane/MobEAD
+
+# =============================================================================
+# 2. CLONAR / INICIALIZAR REPOSITÓRIO
+# =============================================================================
+# Opção A — clonar do zero:
+git clone https://github.com/lucascei/MobEAD.git
+cd MobEAD
+
+# Opção B — projeto local já existente (usado nesta atividade):
+cd ~/Documentos/pós/projeto-DevOps
+git init
+git remote add origin https://github.com/lucascei/MobEAD.git
+git fetch origin
+
+# =============================================================================
+# 3. CONFIGURAR IDENTIDADE GIT (se ainda não configurado)
+# =============================================================================
+git config user.name "Lucas Alves"
+git config user.email "seu.email@exemplo.com"
+
+# =============================================================================
+# 4. CRIAR BRANCH DE DESENVOLVIMENTO
+# =============================================================================
+git checkout -b develop
+
+# =============================================================================
+# 5. ADICIONAR ARQUIVOS DA PIPELINE CI/CD
+# =============================================================================
+git status
+git add Jenkinsfile
+git add docker-compose.yml
+git add Dockerfile
+git add package.json
+git add package-lock.json
+git add sonar-project.properties
+git add comandos-git.txt
+git add README.md
+git add lib/
+git add tests/
+git add scripts/
+git add docker/
+git add evidencias/
+git add .dockerignore
+
+# Ou adicionar tudo de uma vez:
+git add .
+
+# =============================================================================
+# 6. REALIZAR COMMITS
+# =============================================================================
+git commit -m "Adiciona pipeline CI/CD com Jenkins, SonarQube e deploy DEV/PROD"
+
+# Commits adicionais (exemplos):
+git commit -m "Adiciona testes automatizados com Mocha e Chai"
+git commit -m "Configura Jenkinsfile com aprovação manual para produção"
+git commit -m "Adiciona docker-compose com Jenkins e SonarQube"
+
+# =============================================================================
+# 7. ENVIAR ALTERAÇÕES PARA O GITHUB
+# =============================================================================
+# Primeiro push da branch develop:
+git push -u origin develop
+# URL do fork: https://github.com/lucascei/MobEAD.git
+
+# Pushes subsequentes:
+git push origin develop
+
+# =============================================================================
+# 8. COMANDOS AUXILIARES
+# =============================================================================
+# Ver histórico de commits
+git log --oneline --graph --all
+
+# Ver branch atual
+git branch
+
+# Ver status do repositório
+git status
+
+# Ver diferenças antes do commit
+git diff
+
+# Sincronizar com o repositório original (opcional)
+git remote add upstream https://github.com/osanam-giordane/MobEAD.git
+git fetch upstream
+git merge upstream/main
+
+# Criar Pull Request (via GitHub CLI - opcional)
+# gh pr create --base main --head develop --title "Pipeline CI/CD - Lucas Alves"
+
+# =============================================================================
+# 9. TAGS (opcional - para marcar versão de entrega)
+# =============================================================================
+git tag -a v1.0.0-ci-cd -m "Entrega Unidade 2 - Pipeline CI/CD Lucas Alves"
+git push origin v1.0.0-ci-cd
